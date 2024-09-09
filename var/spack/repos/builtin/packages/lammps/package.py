@@ -631,7 +631,7 @@ class Lammps(CMakePackage, CudaPackage, ROCmPackage, PythonExtension):
         default="fftw3",
         when="+kspace",
         description="FFT library for KSPACE package",
-        values=("kiss", "fftw3", "mkl"),
+        values=("kiss", "fftw3", "mkl", "nvpl"),
         multi=False,
     )
     variant(
@@ -639,7 +639,7 @@ class Lammps(CMakePackage, CudaPackage, ROCmPackage, PythonExtension):
         default="fftw3",
         when="@20240417: +kspace+kokkos",
         description="FFT library for Kokkos-enabled KSPACE package",
-        values=("kiss", "fftw3", "mkl", "hipfft", "cufft"),
+        values=("kiss", "fftw3", "mkl", "nvpl", "hipfft", "cufft"),
         multi=False,
     )
     variant(
@@ -660,6 +660,8 @@ class Lammps(CMakePackage, CudaPackage, ROCmPackage, PythonExtension):
     depends_on("hipfft", when="+kokkos+kspace+rocm fft_kokkos=hipfft")
     depends_on("fftw-api@3", when="+kokkos+kspace fft_kokkos=fftw3")
     depends_on("mkl", when="+kokkos+kspace fft_kokkos=mkl")
+    depends_on("nvpl-fft", when="+kspace fft=nvpl")
+    depends_on("nvpl-fft", when="+kokkos+kspace fft_kokkos=nvpl")
     depends_on("voropp+pic", when="+voronoi")
     depends_on("netcdf-c+mpi", when="+user-netcdf")
     depends_on("netcdf-c+mpi", when="+netcdf")
@@ -776,6 +778,8 @@ class Lammps(CMakePackage, CudaPackage, ROCmPackage, PythonExtension):
         msg="ROCm builds of the GPU package not maintained prior to version 20220623",
     )
     conflicts("+intel", when="%aocc@:3.2.9999", msg="+intel with AOCC requires version 4 or newer")
+    conflicts("fft=nvpl", when="@:20240829", msg="fft=nvpl requires newer LAMMPS version")
+    conflicts("fft_kokkos=nvpl", when="@:20240829", msg="fft_kokkos=nvpl requires newer LAMMPS version")
 
     # Backport of https://github.com/lammps/lammps/pull/3726
     conflicts("+kokkos+rocm+kspace", when="@:20210929.3")
