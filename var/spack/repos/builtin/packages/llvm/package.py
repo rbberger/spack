@@ -537,6 +537,13 @@ class Llvm(CMakePackage, CudaPackage, LlvmDetection, CompilerPackage):
         when="@5+lld%clang@7:",
     )
 
+    # Fix offloading segfaults due to libffi: https://github.com/llvm/llvm-project/pull/128756
+    patch(
+        "https://github.com/llvm/llvm-project/pull/128756.patch",
+        sha256="706b6c5db70632271a9cd054f04282610f0f80814f910784bea692be61e166f7",
+        when="@19: +libomptarget",
+    )
+
     # Add missing include directives for the standard headers (the real need for the following
     # patches depends on the implementation of the standard C++ library, the headers, however, must
     # be included according to the standard, therefore, we apply the patches regardless of the
